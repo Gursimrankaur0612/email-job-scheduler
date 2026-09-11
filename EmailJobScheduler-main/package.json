@@ -1,0 +1,21 @@
+{
+  "name": "email-job-scheduler",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n docker,backend,frontend -c blue,green,magenta \"npm:dev:docker\" \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:docker": "docker compose up",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

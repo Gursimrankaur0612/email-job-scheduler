@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Rich-text content styling, shared by the Tiptap compose editor (.ProseMirror)
+   and the read-only email detail view (.rendered-email-body) — minimal, since
+   we don't pull in the Tailwind typography plugin just for this. */
+.ProseMirror,
+.rendered-email-body {
+  outline: none;
+}
+.ProseMirror ul,
+.ProseMirror ol,
+.rendered-email-body ul,
+.rendered-email-body ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.ProseMirror ul,
+.rendered-email-body ul {
+  list-style: disc;
+}
+.ProseMirror ol,
+.rendered-email-body ol {
+  list-style: decimal;
+}
+.ProseMirror blockquote,
+.rendered-email-body blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: #6b7280;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #9ca3af;
+  pointer-events: none;
+}

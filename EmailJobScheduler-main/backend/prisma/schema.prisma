@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmailStatus {
+  scheduled
+  sent
+  failed
+}
+
+model Sender {
+  id           String   @id @default(uuid())
+  displayName  String   @map("display_name")
+  email        String   @unique
+  smtpHost     String   @map("smtp_host")
+  smtpPort     Int      @map("smtp_port")
+  smtpUser     String   @map("smtp_user")
+  smtpPassword String   @map("smtp_password")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  scheduledEmails ScheduledEmail[]
+  rateLimitEvents RateLimitEvent[]
+
+  @@map("senders")
+}
+
+model ScheduledEmail {
+  id           String      @id @default(uuid())
+  senderId     String      @map("sender_id")
+  sender       Sender      @relation(fields: [senderId], references: [id])
+  recipient    String
+  subject      String
+  body         String
+  scheduledAt  DateTime    @map("scheduled_at")
+  status       EmailStatus @default(scheduled)
+  bullmqJobId  String?     @map("bullmq_job_id")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  sentAt       DateTime?   @map("sent_at")
+  errorMessage String?     @map("error_message")
+  // Ethereal's message-preview link, captured from nodemailer's response at
+  // send time (nodemailer.getTestMessageUrl) — null for non-Ethereal SMTP.
+  previewUrl   String?     @map("preview_url")
+
+  rateLimitEvents RateLimitEvent[]
+
+  // Pagination/sort in GET /emails/scheduled and GET /emails/sent filters by
+  // status and orders by scheduled_at or sent_at, so both are indexed together.
+  @@index([status, scheduledAt])
+  @@index([status, sentAt])
+  @@index([senderId])
+  @@map("scheduled_emails")
+}
+
+// Audit trail for rate-limit decisions (e.g. a sender's hourly cap forcing
+// wider spacing than requested). Not consumed by the app logic itself.
+model RateLimitEvent {
+  id               String          @id @default(uuid())
+  senderId         String          @map("sender_id")
+  sender           Sender          @relation(fields: [senderId], references: [id])
+  scheduledEmailId String?         @map("scheduled_email_id")
+  scheduledEmail   ScheduledEmail? @relation(fields: [scheduledEmailId], references: [id])
+  eventType        String          @map("event_type")
+  detail           String?
+  occurredAt       DateTime        @default(now()) @map("occurred_at")
+
+  @@index([senderId, occurredAt])
+  @@map("rate_limit_events")
+}
