@@ -2,7 +2,7 @@
 
 **Live:** [Frontend](https://emailjobscheduler-production.up.railway.app) · [Backend](https://fulfilling-dream-production-4d89.up.railway.app) · [Ethereal inbox](https://ethereal.email)
 
-**Demo video:** [Watch here](https://drive.google.com/file/d/1WCCRjiQRAx7QN93trA8gKevsrZmoKn2E/view?usp=sharing)
+
 
 Schedule bulk emails to send later, spread across multiple sender identities, with a Redis-backed hourly rate limit per sender and a minimum delay between sends. Backend is Express + Prisma/Postgres + BullMQ/Redis; frontend is Next.js (App Router) with real Google OAuth via NextAuth. Built and manually verified end-to-end against a real Postgres/Redis/Ethereal stack — see the Architecture section for what was actually tested, not just implemented.
 
